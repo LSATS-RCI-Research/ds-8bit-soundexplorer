@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dwxtgriqq1iik"]
+
+[ext_resource type="FontFile" uid="uid://debc43jjhixuq" path="res://fonts/PixelOperator/PixelOperatorMono-Bold.ttf" id="1_loscs"]
+
+[resource]
+default_font = ExtResource("1_loscs")
+default_font_size = 24
+RichTextLabel/colors/default_color = Color(0.827464, 0.858212, 0.87133, 1)
+RichTextLabel/colors/font_outline_color = Color(0.0338533, 0.0338533, 0.0338533, 1)
+RichTextLabel/constants/line_separation = 0
+RichTextLabel/constants/outline_size = 0

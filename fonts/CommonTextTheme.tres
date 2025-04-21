@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dl3aqy5brhkf4"]
+
+[ext_resource type="FontFile" uid="uid://eefowr6xd7vw" path="res://fonts/PixelOperator/PixelOperator.ttf" id="1_7ptgl"]
+
+[resource]
+default_font = ExtResource("1_7ptgl")
+default_font_size = 64
+RichTextLabel/colors/default_color = Color(0.906119, 0.935179, 0.959885, 1)
+RichTextLabel/colors/font_outline_color = Color(0.0136886, 0.0243793, 0.0221075, 1)
+RichTextLabel/constants/outline_size = 16

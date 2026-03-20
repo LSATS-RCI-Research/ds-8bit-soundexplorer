@@ -1,8 +1,10 @@
 extends Control
 
+# Signals
+signal midi_note_on()
+
 # Objects
 var midiloglabel: RichTextLabel
-var catsprite: AnimatedSprite2D
 var dx_parent: Node
 var quickstart: Node2D
 
@@ -83,7 +85,6 @@ func _ready():
 	
 	# Assign nodes
 	midiloglabel = $MidiLogLabel
-	catsprite = $Background/Cat
 	dx_parent = $DxParent
 	quickstart = $QuickStart
 	
@@ -122,7 +123,7 @@ func _input(input_event):
 		_print_midi_info(input_event)
 		if input_event.channel == MIDI_CHANNEL_PULSE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
-				catsprite.frame = randi() % catsprite.sprite_frames.get_frame_count('default')
+				midi_note_on.emit()
 				match input_event.pitch:
 					MIDI_PITCH_PULSE1:
 						btn_pulse1.frame = 1
@@ -161,7 +162,7 @@ func _input(input_event):
 				dx_parent.new_prompt(DX_PULSE_SWP)
 		elif input_event.channel == MIDI_CHANNEL_WAVE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
-				catsprite.frame = randi() % catsprite.sprite_frames.get_frame_count('default')
+				midi_note_on.emit()
 				match input_event.pitch:
 					MIDI_PITCH_QS:
 						quickstart.turnon()

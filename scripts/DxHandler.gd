@@ -20,7 +20,7 @@ func new_prompt(new_text : String):
 			dx_text.text = new_text
 			dx_text.visible_ratio = 0
 			var tween = dx_text.create_tween()
-			tween.tween_property(dx_text, "visible_ratio", 1.0, 0.5)
+			tween.tween_property(dx_text, "visible_ratio", 1.0, 1.0)
 			# Restart timers
 			dx_min_timer.start()
 			dx_max_timer.start()

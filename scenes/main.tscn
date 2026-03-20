@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://cjd5sb4udc25h"]
+[gd_scene load_steps=33 format=3 uid="uid://cjd5sb4udc25h"]
 
 [ext_resource type="Script" uid="uid://w7jk6o6ca8js" path="res://scripts/MidiHandler.gd" id="1_0wfyh"]
 [ext_resource type="Shader" uid="uid://dme7736usby6i" path="res://shaders/dither.gdshader" id="1_dp3eg"]
@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://orvty1x11n8f" path="res://art/clouds.png" id="12_dp3eg"]
 [ext_resource type="Texture2D" uid="uid://d1xi3kouwr4ap" path="res://art/xplr-cat.png" id="12_eb6dy"]
 [ext_resource type="Script" uid="uid://bdhvf702hdb4o" path="res://scripts/DxHandler.gd" id="14_a8y0u"]
+[ext_resource type="Script" uid="uid://cjvt0shdf8dwu" path="res://scenes/cat.gd" id="15_0ld40"]
 [ext_resource type="Script" uid="uid://djp76jmmobnpb" path="res://scripts/QSHandler.gd" id="15_jkv2x"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_85g3d"]
@@ -540,13 +541,15 @@ offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("12_dp3eg")
 
-[node name="Cat" type="AnimatedSprite2D" parent="Background"]
+[node name="Cat" type="AnimatedSprite2D" parent="Background" node_paths=PackedStringArray("midi_handler")]
 z_index = -5
 position = Vector2(1670, 354)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_og1vs")
 frame = 5
 frame_progress = 0.024737
+script = ExtResource("15_0ld40")
+midi_handler = NodePath("../..")
 
 [node name="Dither" type="TextureRect" parent="Background"]
 z_index = -8

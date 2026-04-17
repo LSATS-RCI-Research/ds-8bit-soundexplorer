@@ -5,7 +5,8 @@ signal midi_note_on()
 
 # Objects
 var midiloglabel: RichTextLabel
-var dx_parent: Node
+@export var dx_parent: Node
+@export var pot_prompt_timer: Timer
 var quickstart: Node2D
 
 # Pulse
@@ -85,7 +86,6 @@ func _ready():
 	
 	# Assign nodes
 	midiloglabel = $MidiLogLabel
-	dx_parent = $DxParent
 	quickstart = $QuickStart
 	
 	btn_pulse1 = $Pulse/Btn1
@@ -153,13 +153,13 @@ func _input(input_event):
 						btn_pulse4.frame = 0
 			elif input_event.controller_number == MIDI_CC_PULSE_SHP:
 				pot_pulse1.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				dx_parent.new_prompt(DX_PULSE_SHP)
+				sendPotPrompt(DX_PULSE_SHP)
 			elif input_event.controller_number == MIDI_CC_PULSE_ENV:
 				pot_pulse2.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				dx_parent.new_prompt(DX_PULSE_ENV)
+				sendPotPrompt(DX_PULSE_ENV)
 			elif input_event.controller_number == MIDI_CC_PULSE_SWP:
 				pot_pulse3.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				dx_parent.new_prompt(DX_PULSE_SWP)
+				sendPotPrompt(DX_PULSE_SWP)
 		elif input_event.channel == MIDI_CHANNEL_WAVE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
 				midi_note_on.emit()
@@ -194,10 +194,10 @@ func _input(input_event):
 						btn_wave4.frame = 0
 			elif input_event.controller_number == MIDI_CC_WAVE_SHP:
 				pot_wave1.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				dx_parent.new_prompt(DX_WAVE_SHP)
+				sendPotPrompt(DX_WAVE_SHP)
 			elif input_event.controller_number == MIDI_CC_WAVE_ENV:
 				pot_wave2.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				dx_parent.new_prompt(DX_WAVE_ENV)
+				sendPotPrompt(DX_WAVE_ENV)
 		elif input_event.channel == MIDI_CHANNEL_NOISE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
 				# We lack info to do this correctly, so just affect all of them
@@ -216,6 +216,12 @@ func _input(input_event):
 				btn_noise3.frame = 0
 		else:
 			midiloglabel.append_text(str("\nIgnoring event from channel ", input_event.channel))
+
+func sendPotPrompt(prompt : String) -> void:
+	"""Throttles the rate at which Pot prompts are sent."""
+	if pot_prompt_timer.is_stopped():
+		dx_parent.new_prompt(prompt)
+		pot_prompt_timer.start()
 
 func _print_midi_info(midi_event):
 	### Channel + Number == pot that is being used

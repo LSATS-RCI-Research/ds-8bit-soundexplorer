@@ -1,3 +1,6 @@
+*.exe
+*.dmg
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos,godot
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,godot
 

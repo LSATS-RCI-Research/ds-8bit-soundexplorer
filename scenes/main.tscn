@@ -575,7 +575,7 @@ script = ExtResource("14_a8y0u")
 dx_text = NodePath("Dx")
 dx_readspeed_timer = NodePath("DxReadspeed")
 dx_obsolete_timer = NodePath("DxObsolete")
-dx_prompt_log_size = 4
+dx_prompt_log_size = 6
 
 [node name="Dx" type="RichTextLabel" parent="DxParent"]
 anchors_preset = 10
@@ -598,8 +598,12 @@ wait_time = 4.0
 one_shot = true
 
 [node name="DxObsolete" type="Timer" parent="DxParent"]
-wait_time = 20.0
+wait_time = 15.0
 one_shot = true
+
+[node name="DxLogDecay" type="Timer" parent="DxParent"]
+wait_time = 0.5
+autostart = true
 
 [node name="QuickStart" type="Node2D" parent="."]
 visible = false
@@ -648,4 +652,5 @@ wait_time = 20.0
 one_shot = true
 
 [connection signal="timeout" from="DxParent/DxObsolete" to="DxParent" method="_on_dx_obsolete_timeout"]
+[connection signal="timeout" from="DxParent/DxLogDecay" to="DxParent" method="_on_log_decay_timeout"]
 [connection signal="timeout" from="QuickStart/QSMaximum" to="QuickStart" method="_on_qs_maximum_timeout"]

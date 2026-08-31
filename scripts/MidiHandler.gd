@@ -1,45 +1,82 @@
+class_name MIDIHandler
 extends Control
 
+enum MIDITarget {
+	NONE,
+	PULSE_BTN_1,
+	PULSE_BTN_2,
+	PULSE_BTN_3,
+	PULSE_BTN_4,
+	PULSE_POT_1,
+	PULSE_POT_2,
+	PULSE_POT_3,
+	WAVE_BTN_1,
+	WAVE_BTN_2,
+	WAVE_BTN_3,
+	WAVE_BTN_4,
+	WAVE_POT_1,
+	WAVE_POT_2,
+	NOISE_BTN_1,
+	NOISE_BTN_2,
+	NOISE_BTN_3,
+	NOISE_POT_1,
+	NOISE_POT_2,
+	NOISE_POT_3,
+	NOISE_POT_4,
+	NOISE_POT_5,
+	NOISE_POT_6,
+}
+
+enum MIDIEvent {
+	NONE,
+	PRESS,
+	RELEASE,
+	CHANGE,
+}
+
 # Signals
-signal midi_note_on()
+signal midi_event(target : MIDITarget, event : MIDIEvent, value : int)
 
 # Objects
-var midiloglabel: RichTextLabel
+@export var midiloglabel: RichTextLabel
 @export var dx_parent: Node
 @export var pot_prompt_timer: Timer
-var quickstart: Node2D
+@export var quick_start: Node2D
 
 # Pulse
-var btn_pulse1: AnimatedSprite2D
-var btn_pulse2: AnimatedSprite2D
-var btn_pulse3: AnimatedSprite2D
-var btn_pulse4: AnimatedSprite2D
-var pot_pulse1: Sprite2D
-var pot_pulse2: Sprite2D
-var pot_pulse3: Sprite2D
+@export_group("Pulse Controls")
+@export var btn_pulse1: AnimatedSprite2D
+@export var btn_pulse2: AnimatedSprite2D
+@export var btn_pulse3: AnimatedSprite2D
+@export var btn_pulse4: AnimatedSprite2D
+@export var pot_pulse1: Sprite2D
+@export var pot_pulse2: Sprite2D
+@export var pot_pulse3: Sprite2D
 
 # Wave
-var btn_wave1: AnimatedSprite2D
-var btn_wave2: AnimatedSprite2D
-var btn_wave3: AnimatedSprite2D
-var btn_wave4: AnimatedSprite2D
-var pot_wave1: Sprite2D
-var pot_wave2: Sprite2D
+@export_group("Wave Controls")
+@export var btn_wave1: AnimatedSprite2D
+@export var btn_wave2: AnimatedSprite2D
+@export var btn_wave3: AnimatedSprite2D
+@export var btn_wave4: AnimatedSprite2D
+@export var pot_wave1: Sprite2D
+@export var pot_wave2: Sprite2D
 
 # Noise
-var btn_noise1: AnimatedSprite2D
-var btn_noise2: AnimatedSprite2D
-var btn_noise3: AnimatedSprite2D
-var pot_noise1: Sprite2D
-var pot_noise2: Sprite2D
-var pot_noise3: Sprite2D
-var pot_noise4: Sprite2D
-var pot_noise5: Sprite2D
-var pot_noise6: Sprite2D
+@export_group("Noise Controls")
+@export var btn_noise1: AnimatedSprite2D
+@export var btn_noise2: AnimatedSprite2D
+@export var btn_noise3: AnimatedSprite2D
+@export var pot_noise1: Sprite2D
+@export var pot_noise2: Sprite2D
+@export var pot_noise3: Sprite2D
+@export var pot_noise4: Sprite2D
+@export var pot_noise5: Sprite2D
+@export var pot_noise6: Sprite2D
 
 # Potentiometer math
 const POT_MIN_VAL: int = 0
-const POT_MAX_VAL: int = 128 # ch0 ch3 ch4 
+const POT_MAX_VAL: int = 128
 const POT_MIN_DEG: int = -135
 const POT_MAX_DEG: int = 135
 
@@ -83,36 +120,7 @@ func _ready():
 	# Receive MIDI Inputs
 	OS.open_midi_inputs()
 	print(OS.get_connected_midi_inputs())
-	
-	# Assign nodes
-	midiloglabel = $MidiLogLabel
-	quickstart = $QuickStart
-	
-	btn_pulse1 = $Pulse/Btn1
-	btn_pulse2 = $Pulse/Btn2
-	btn_pulse3 = $Pulse/Btn3
-	btn_pulse4 = $Pulse/Btn4
-	pot_pulse1 = $Pulse/Pot1
-	pot_pulse2 = $Pulse/Pot2
-	pot_pulse3 = $Pulse/Pot3
-	
-	btn_wave1 = $Wave/Btn1
-	btn_wave2 = $Wave/Btn2
-	btn_wave3 = $Wave/Btn3
-	btn_wave4 = $Wave/Btn4
-	pot_wave1 = $Wave/Pot1
-	pot_wave2 = $Wave/Pot2
-	
-	btn_noise1 = $Noise/Btn1
-	btn_noise2 = $Noise/Btn2
-	btn_noise3 = $Noise/Btn3
-	pot_noise1 = $Noise/Pot1
-	pot_noise2 = $Noise/Pot2
-	pot_noise3 = $Noise/Pot3
-	pot_noise4 = $Noise/Pot4
-	pot_noise5 = $Noise/Pot5
-	pot_noise6 = $Noise/Pot6
-	
+
 	midiloglabel.append_text(str(OS.get_connected_midi_inputs()))
 	midiloglabel.append_text(str("\nListening to MIDI channel ", MIDI_CHANNEL_PULSE, " for PULSE"))
 	midiloglabel.append_text(str("\nListening to MIDI channel ", MIDI_CHANNEL_WAVE, " for WAVE"))
@@ -121,26 +129,99 @@ func _ready():
 func _input(input_event):
 	if input_event is InputEventMIDI:
 		_print_midi_info(input_event)
+		var target : MIDITarget
+		var event : MIDIEvent
+		var value : int
+		var is_noise : bool = false
+		
+		# Determine MIDI target
+		match input_event.channel:
+			MIDI_CHANNEL_PULSE:
+				match input_event.pitch:
+					MIDI_PITCH_PULSE1:
+						target = MIDITarget.PULSE_BTN_1
+					MIDI_PITCH_PULSE2:
+						target = MIDITarget.PULSE_BTN_2
+					MIDI_PITCH_PULSE3:
+						target = MIDITarget.PULSE_BTN_3
+					MIDI_PITCH_PULSE4:
+						target = MIDITarget.PULSE_BTN_4
+				match input_event.controller_number:
+					MIDI_CC_PULSE_SHP:
+						target = MIDITarget.PULSE_POT_1
+					MIDI_CC_PULSE_ENV:
+						target = MIDITarget.PULSE_POT_2
+					MIDI_CC_PULSE_SWP:
+						target = MIDITarget.PULSE_POT_3
+			MIDI_CHANNEL_WAVE:
+				match input_event.pitch:
+					MIDI_PITCH_WAVE1:
+						target = MIDITarget.WAVE_BTN_1
+					MIDI_PITCH_WAVE2:
+						target = MIDITarget.WAVE_BTN_2
+					MIDI_PITCH_WAVE3:
+						target = MIDITarget.WAVE_BTN_3
+					MIDI_PITCH_WAVE4:
+						target = MIDITarget.WAVE_BTN_4
+				match input_event.controller_number:
+					MIDI_CC_WAVE_SHP:
+						target = MIDITarget.WAVE_POT_1
+					MIDI_CC_WAVE_ENV:
+						target = MIDITarget.WAVE_POT_2
+			MIDI_CHANNEL_NOISE:
+				# We currently lack the info needed to do this correctly
+				target = MIDITarget.NOISE_BTN_1
+				is_noise = true
+
+		# Determine MIDI Event
+		match input_event.message:
+			MIDI_MESSAGE_NOTE_ON:
+				event = MIDIEvent.PRESS
+				value = input_event.velocity
+			MIDI_MESSAGE_NOTE_OFF:
+				event = MIDIEvent.RELEASE
+				value = 0
+		if input_event.controller_number != 0:
+			event = MIDIEvent.CHANGE
+			value = input_event.controller_value
+		
+		# Emit signal
+		if target != MIDITarget.NONE and event != MIDIEvent.NONE:
+			if is_noise:
+				# We currently lack the info needed to do this correctly
+				midi_event.emit(MIDITarget.NOISE_BTN_1, event, value)
+				midi_event.emit(MIDITarget.NOISE_BTN_2, event, value)
+				midi_event.emit(MIDITarget.NOISE_BTN_3, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_1, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_2, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_3, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_4, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_5, event, value)
+				midi_event.emit(MIDITarget.NOISE_POT_6, event, value)
+			else:
+				midi_event.emit(target, event, value)
+	return
+	if input_event is InputEventMIDI:
+		_print_midi_info(input_event)
 		if input_event.channel == MIDI_CHANNEL_PULSE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
-				midi_note_on.emit()
 				match input_event.pitch:
 					MIDI_PITCH_PULSE1:
 						btn_pulse1.frame = 1
 						dx_parent.new_prompt(DX_PULSE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_PULSE2:
 						btn_pulse2.frame = 1
 						dx_parent.new_prompt(DX_PULSE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_PULSE3:
 						btn_pulse3.frame = 1
 						dx_parent.new_prompt(DX_PULSE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_PULSE4:
 						btn_pulse4.frame = 1
 						dx_parent.new_prompt(DX_PULSE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 			elif input_event.message == MIDI_MESSAGE_NOTE_OFF:
 				match input_event.pitch:
 					MIDI_PITCH_PULSE1:
@@ -162,26 +243,26 @@ func _input(input_event):
 				sendPotPrompt(DX_PULSE_SWP)
 		elif input_event.channel == MIDI_CHANNEL_WAVE:
 			if input_event.message == MIDI_MESSAGE_NOTE_ON:
-				midi_note_on.emit()
+				#midi_note_on.emit()
 				match input_event.pitch:
 					MIDI_PITCH_QS:
-						quickstart.turnon()
+						quick_start.turnon()
 					MIDI_PITCH_WAVE1:
 						btn_wave1.frame = 1
 						dx_parent.new_prompt(DX_WAVE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_WAVE2:
 						btn_wave2.frame = 1
 						dx_parent.new_prompt(DX_WAVE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_WAVE3:
 						btn_wave3.frame = 1
 						dx_parent.new_prompt(DX_WAVE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 					MIDI_PITCH_WAVE4:
 						btn_wave4.frame = 1
 						dx_parent.new_prompt(DX_WAVE_BTN)
-						quickstart.turnoff()
+						quick_start.turnoff()
 			elif input_event.message == MIDI_MESSAGE_NOTE_OFF:
 				match input_event.pitch:
 					MIDI_PITCH_WAVE1:
@@ -208,7 +289,7 @@ func _input(input_event):
 				pot_noise2.rotation_degrees = _pot_to_degs(input_event.controller_value)
 				pot_noise4.rotation_degrees = _pot_to_degs(input_event.controller_value)
 				pot_noise6.rotation_degrees = _pot_to_degs(input_event.controller_value)
-				quickstart.turnoff()
+				quick_start.turnoff()
 			elif input_event.message == MIDI_MESSAGE_NOTE_OFF:
 				# We lack info to do this correctly, so just affect all of them
 				btn_noise1.frame = 0
@@ -223,14 +304,14 @@ func sendPotPrompt(prompt : String) -> void:
 		dx_parent.new_prompt(prompt)
 		pot_prompt_timer.start()
 
-func _print_midi_info(midi_event):
+func _print_midi_info(event):
 	### Channel + Number == pot that is being used
 	midiloglabel.append_text("\n--------")
-	midiloglabel.append_text(str("\nChl: ", midi_event.channel))
-	midiloglabel.append_text(str("  Msg: ", midi_event.message))
-	midiloglabel.append_text(str("  Pit: ", midi_event.pitch))
-	midiloglabel.append_text(str("\nCtrlNum: ", midi_event.controller_number))
-	midiloglabel.append_text(str("  CtrlVal: ", midi_event.controller_value))
+	midiloglabel.append_text(str("\nChl: ", event.channel))
+	midiloglabel.append_text(str("  Msg: ", event.message))
+	midiloglabel.append_text(str("  Pit: ", event.pitch))
+	midiloglabel.append_text(str("\nCtrlNum: ", event.controller_number))
+	midiloglabel.append_text(str("  CtrlVal: ", event.controller_value))
 
 func _pot_to_degs(val: int):
 	# Normalize the potentiometer's value to be a weighting between 0-1

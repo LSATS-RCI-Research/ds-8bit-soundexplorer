@@ -13,7 +13,6 @@ func _ready():
 
 func update_prompt_log(prompt : String) -> void:
 	"""Adds the prompt to the end of the log and pops the front of the log."""
-	print("log: ", dx_prompt_log.size())
 	dx_prompt_log.append(prompt)
 	if dx_prompt_log.size() > dx_prompt_log_size:
 		dx_prompt_log.pop_front()
@@ -55,5 +54,4 @@ func _on_dx_obsolete_timeout() -> void:
 
 func _on_log_decay_timeout() -> void:
 	"""Remove oldest item from the prompt log."""
-	print("decay")
 	dx_prompt_log.pop_front()

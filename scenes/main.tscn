@@ -1,10 +1,11 @@
-[gd_scene load_steps=33 format=3 uid="uid://cjd5sb4udc25h"]
+[gd_scene load_steps=34 format=3 uid="uid://cjd5sb4udc25h"]
 
 [ext_resource type="Script" uid="uid://w7jk6o6ca8js" path="res://scripts/MidiHandler.gd" id="1_0wfyh"]
 [ext_resource type="Shader" uid="uid://dme7736usby6i" path="res://shaders/dither.gdshader" id="1_dp3eg"]
 [ext_resource type="Theme" uid="uid://dl3aqy5brhkf4" path="res://fonts/CommonTextTheme.tres" id="2_sugp2"]
 [ext_resource type="Texture2D" uid="uid://2ld8wxssb2is" path="res://art/xplr-bg.png" id="4_jyhfs"]
 [ext_resource type="Texture2D" uid="uid://ct7848l4jvmep" path="res://art/xplr-btn-gu.png" id="4_o6xl0"]
+[ext_resource type="Script" uid="uid://da55gqnxwodq7" path="res://scripts/BtnHandler.gd" id="5_gqmmt"]
 [ext_resource type="Texture2D" uid="uid://c4c4p5mpmhu1h" path="res://art/xplr-btn-bd.png" id="5_tefeu"]
 [ext_resource type="Texture2D" uid="uid://bieus03dl6161" path="res://art/xplr-btn-gd.png" id="5_tipki"]
 [ext_resource type="Theme" uid="uid://dwxtgriqq1iik" path="res://fonts/SmallTextTheme.tres" id="5_trceg"]
@@ -123,7 +124,7 @@ shader_parameter/bit_depth = 16.0
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_dp3eg"]
 
-[node name="Control" type="Control" node_paths=PackedStringArray("dx_parent", "pot_prompt_timer")]
+[node name="Control" type="Control" node_paths=PackedStringArray("midiloglabel", "dx_parent", "pot_prompt_timer", "quick_start", "btn_pulse1", "btn_pulse2", "btn_pulse3", "btn_pulse4", "pot_pulse1", "pot_pulse2", "pot_pulse3", "btn_wave1", "btn_wave2", "btn_wave3", "btn_wave4", "pot_wave1", "pot_wave2", "btn_noise1", "btn_noise2", "btn_noise3", "pot_noise1", "pot_noise2", "pot_noise3", "pot_noise4", "pot_noise5", "pot_noise6")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -135,11 +136,34 @@ offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0wfyh")
+midiloglabel = NodePath("MidiLogLabel")
 dx_parent = NodePath("DxParent")
 pot_prompt_timer = NodePath("PotPromptTimer")
+quick_start = NodePath("QuickStart")
+btn_pulse1 = NodePath("Pulse/Btn1")
+btn_pulse2 = NodePath("Pulse/Btn2")
+btn_pulse3 = NodePath("Pulse/Btn3")
+btn_pulse4 = NodePath("Pulse/Btn4")
+pot_pulse1 = NodePath("Pulse/Pot1")
+pot_pulse2 = NodePath("Pulse/Pot2")
+pot_pulse3 = NodePath("Pulse/Pot3")
+btn_wave1 = NodePath("Wave/Btn1")
+btn_wave2 = NodePath("Wave/Btn2")
+btn_wave3 = NodePath("Wave/Btn3")
+btn_wave4 = NodePath("Wave/Btn4")
+pot_wave1 = NodePath("Wave/Pot1")
+pot_wave2 = NodePath("Wave/Pot2")
+btn_noise1 = NodePath("Noise/Btn1")
+btn_noise2 = NodePath("Noise/Btn2")
+btn_noise3 = NodePath("Noise/Btn3")
+pot_noise1 = NodePath("Noise/Pot1")
+pot_noise2 = NodePath("Noise/Pot2")
+pot_noise3 = NodePath("Noise/Pot3")
+pot_noise4 = NodePath("Noise/Pot4")
+pot_noise5 = NodePath("Noise/Pot5")
+pot_noise6 = NodePath("Noise/Pot6")
 
 [node name="MidiLogLabel" type="RichTextLabel" parent="."]
-visible = false
 z_index = 100
 layout_mode = 1
 anchors_preset = 2
@@ -166,21 +190,33 @@ one_shot = true
 
 [node name="Pulse" type="Node2D" parent="."]
 
-[node name="Btn1" type="AnimatedSprite2D" parent="Pulse"]
+[node name="Btn1" type="AnimatedSprite2D" parent="Pulse" node_paths=PackedStringArray("midi_handler")]
 position = Vector2(65, 927)
 sprite_frames = SubResource("SpriteFrames_85g3d")
+script = ExtResource("5_gqmmt")
+midi_handler = NodePath("../..")
+midi_identifier = 1
 
-[node name="Btn2" type="AnimatedSprite2D" parent="Pulse"]
+[node name="Btn2" type="AnimatedSprite2D" parent="Pulse" node_paths=PackedStringArray("midi_handler")]
 position = Vector2(65, 793)
 sprite_frames = SubResource("SpriteFrames_85g3d")
+script = ExtResource("5_gqmmt")
+midi_handler = NodePath("../..")
+midi_identifier = 2
 
-[node name="Btn3" type="AnimatedSprite2D" parent="Pulse"]
+[node name="Btn3" type="AnimatedSprite2D" parent="Pulse" node_paths=PackedStringArray("midi_handler")]
 position = Vector2(239, 793)
 sprite_frames = SubResource("SpriteFrames_85g3d")
+script = ExtResource("5_gqmmt")
+midi_handler = NodePath("../..")
+midi_identifier = 3
 
-[node name="Btn4" type="AnimatedSprite2D" parent="Pulse"]
+[node name="Btn4" type="AnimatedSprite2D" parent="Pulse" node_paths=PackedStringArray("midi_handler")]
 position = Vector2(239, 927)
 sprite_frames = SubResource("SpriteFrames_85g3d")
+script = ExtResource("5_gqmmt")
+midi_handler = NodePath("../..")
+midi_identifier = 4
 
 [node name="Pot1" type="Sprite2D" parent="Pulse"]
 position = Vector2(77, 472)
